@@ -1,5 +1,6 @@
 class User < ApplicationRecord
-  has_one :api_keys
+  has_many :timers
+  # has_many :learning, through: :timers
   has_secure_password
 
   # TODO: add expiration

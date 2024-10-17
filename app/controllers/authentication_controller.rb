@@ -8,7 +8,7 @@ class AuthenticationController < ApplicationController
       if @user&.authenticate(password) 
         token = @user.generate_token_for(:auth_token)
         @user.update(token: token)
-        render json: {user: @user}, status: :created and return
+        render :json => @user, :except=> [:password_digest, :created_at, :updated_at ], status: :created and return
       end
     end
     render status: :unauthorized
