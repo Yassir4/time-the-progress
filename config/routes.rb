@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   post '/signup', to: 'authentication#signup'
 
   post '/timer', to: 'timer#create'
+  get '/timer', to: 'timer#index'
 
   get '/', to: 'authentication#index'
   # Defines the root path route ("/")
