@@ -2,6 +2,7 @@ second_work_round_time_diff_hours = 1
 learning_round_time_diff_hours = 2
 
 time = Time.now
+User.create(email_address: 'yassor@mail.com', password: '123456', name: 'yassir')
 7.times do |i|
   newTime = time + i.day
 

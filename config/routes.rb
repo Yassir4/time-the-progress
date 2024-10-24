@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   post '/timer', to: 'timer#create'
   get '/timer', to: 'timer#index'
 
-  get '/', to: 'authentication#index'
+  # get '/', to: 'authentication#index'
   # Defines the root path route ("/")
   # root "posts#index"
 end
