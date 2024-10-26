@@ -27,7 +27,7 @@ jobs:
             # Remove old container
             docker rm time_it_rails || true
             # Run a new container from a new image
-            docker run -it -p 80:80 -v ./storage:/rails/storage -e RAILS_MASTER_KEY=${{ secrets.MASTER_KEY }} --name time_it_rails time_it_rails
+            docker run -d -p 80:80 -v ./storage:/rails/storage -e RAILS_MASTER_KEY=${{ secrets.MASTER_KEY }} --name time_it_rails time_it_rails
             EOF
 
     
