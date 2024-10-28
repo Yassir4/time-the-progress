@@ -20,14 +20,20 @@ jobs:
             ssh-add /tmp/ssh_key
             ssh -o StrictHostKeyChecking=no root@${{ secrets.DIGITALOCEAN_IP }} << 'EOF'
             cd time-the-progress
-            git pull
 
-            # Stop the running container
-            docker stop time_it_rails || true
-            # Remove old container
-            docker rm time_it_rails || true
-            # Run a new container from a new image
-            docker run -d -p 80:80 -v ./storage:/rails/storage -e RAILS_MASTER_KEY=${{ secrets.MASTER_KEY }} --name time_it_rails time_it_rails
+            git pull
+            CONTAINER_NAME="time_it_rails"
+            docker build -t $CONTAINER_NAME .
+
+            # Check if the container is running
+            if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+                echo "Stopping and removing the running container: $CONTAINER_NAME"
+                docker stop time_it_rails
+                docker rm time_it_rails
+                docker run -d -p 80:3000 -v ./storage:/rails/storage -e RAILS_MASTER_KEY=${{ secrets.MASTER_KEY }} --name time_it_rails time_it_rails
+            else
+                docker run -d -p 80:3000 -v ./storage:/rails/storage -e RAILS_MASTER_KEY=${{ secrets.MASTER_KEY }} --name time_it_rails time_it_rails
+            fi
             EOF
 
     
