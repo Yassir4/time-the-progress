@@ -2,36 +2,39 @@ class AuthenticationController < ApplicationController
   include ActionController::HttpAuthentication::Basic::ControllerMethods
 
   def signin
-    authenticate_with_http_basic do |email, password|
-      @user = User.find_by email_address: email
-
-      if @user&.authenticate(password)
-        token = @user.generate_token_for(:auth_token)
-        @user.update(token: token)
-        render json: @user, except: [ :password_digest, :created_at, :updated_at ], status: :created and return
+    params = user_signin_params
+    @user = User.find_by email_address: params[:email_address]
+    if @user
+      if @user&.authenticate(params[:password])
+        @user.regenerate_token
+        user_response and return
+        return
       end
+      render json: { errors: "wrong password or email" }, status: :unauthorized
     end
-    render status: :unauthorized
   end
 
   def signup
-    @user = User.create(user_params)
+    @user = User.create(user_signup_params)
      if @user.valid?
-      token = @user.generate_token_for(:auth_token)
-      @user.update(token: token)
-      render json: { user: @user }, status: :created and return
+      @user.regenerate_token
+      user_response and return
      else
-      render json: { error: "not valid" }, status: :unauthorized
+      render json: { error: @user.errors }, status: :unauthorized
      end
   end
 
-   private
+  private
 
-   def user_params
-     params.require(:user).permit(:name, :password, :email_address)
-   end
+  def user_signup_params
+    params.require(:user).permit(:name, :password, :email_address)
+  end
 
-  # def delete
+  def user_signin_params
+    params.require(:user).permit(:password, :email_address)
+  end
 
-  # end
+  def user_response
+    render json: { user: @user }, except: [ :password_digest, :created_at, :updated_at ], status: 200
+  end
 end

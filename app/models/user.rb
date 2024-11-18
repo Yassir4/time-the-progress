@@ -1,11 +1,14 @@
 class User < ApplicationRecord
+  validates :email_address, uniqueness: true
+
   has_many :learnings
   has_many :works
   has_many :timers
 
   has_secure_password
 
-  generates_token_for :auth_token
+  has_secure_token :token, length: 80
 
-  normalizes :email_address, with: ->(e) { e.strip.downcase }  
+
+  normalizes :email_address, with: ->(e) { e.strip.downcase }
 end
