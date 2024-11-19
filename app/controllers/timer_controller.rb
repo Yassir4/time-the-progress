@@ -7,9 +7,12 @@ class TimerController < ApplicationController
 
     timers = @user.timers.where("created_at BETWEEN ? AND ?", get_week(cursor).first.beginning_of_day, get_week(cursor).last.end_of_day).order(created_at: :asc)
 
-    result = timers.group_by { |timer|
-      timer.created_at.to_date
-    }
+    result = {}
+    if !timers.empty?
+      result = timers.group_by { |timer|
+        timer.created_at.to_date
+      }
+    end
 
     result = get_week(cursor).each_with_object({}) do |day, acc|
       acc[day] = result[day] || []
@@ -66,7 +69,10 @@ class TimerController < ApplicationController
   end
 
   def has_next_page(cursor = 0)
-    get_week(cursor + 1).first >= @user.timers.order(:created_at).limit(1).first.created_at
+    if @user.timers.order(:created_at).empty?
+      return false
+    end
+    get_week(cursor + 1).first >= @user.timers.order(:created_at).limit(1)&.first.created_at
   end
 
   def encode_intervals(intervals)
@@ -74,8 +80,6 @@ class TimerController < ApplicationController
   end
 
   def decode_intervals(intervals)
-    puts'-----------'
-    puts intervals
     ActiveSupport::JSON.decode(intervals || '[]')
   end
 end
