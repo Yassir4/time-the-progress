@@ -26,9 +26,10 @@ class TimerController < ApplicationController
   def create
     type = timer_params[:type]
     total_time = timer_params[:total_time] || 0
+    all_day_user_time = Time.zone.now.in_time_zone(timer_params[:time_zone]).all_day
 
     if type == "learning"
-      timer = @user.timers.where(type: 'Learning', created_at: Date.today.all_day).first
+      timer = @user.timers.where(type: 'Learning', created_at: all_day_user_time).first
       if timer.nil?
         Learning.create(user: @user, total_time: total_time, intervals: encode_intervals([Time.now]))
       else
@@ -39,7 +40,7 @@ class TimerController < ApplicationController
       end
       render json: { status: 200 }
     else type == "work"
-      timer = @user.timers.where(type: 'Work', created_at: Date.today.all_day).first
+      timer = @user.timers.where(type: 'Work', created_at: all_day_user_time).first
       if timer.nil?
         Work.create(user: @user, total_time: total_time, intervals: encode_intervals([Time.now]))
       else
@@ -52,9 +53,6 @@ class TimerController < ApplicationController
     end
   end
 
-  def updated
-
-  end
   private
 
   def timer_params
