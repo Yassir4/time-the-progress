@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_18_093233) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_03_164253) do
   create_table "timers", force: :cascade do |t|
     t.string "type"
     t.integer "user_id", null: false

@@ -4,9 +4,7 @@ class TimerController < ApplicationController
 
   def index
     cursor = timer_params[:cursor].to_i || 0
-
     timers = @user.timers.where("created_at BETWEEN ? AND ?", get_week(cursor).first.beginning_of_day, get_week(cursor).last.end_of_day).order(created_at: :asc)
-
     result = {}
     if !timers.empty?
       result = timers.group_by { |timer|
@@ -15,7 +13,8 @@ class TimerController < ApplicationController
     end
 
     result = get_week(cursor).each_with_object({}) do |day, acc|
-      acc[day] = result[day] || []
+      current_day = day.to_date
+      acc[current_day] = result[current_day] || []
     end
 
     render json: {
@@ -59,13 +58,17 @@ class TimerController < ApplicationController
   private
 
   def timer_params
-    params.permit(:type, :cursor, :total_time)
+    params.permit(:type, :cursor, :total_time, :time_zone)
   end
 
   def get_week(cursor = 0)
-    start_of_week = Date.today.at_beginning_of_week - (cursor * 7)
-    end_of_week = Date.today.at_end_of_week - (cursor * 7)
-    (start_of_week..end_of_week).to_a
+    start_of_week = Time.zone.now.in_time_zone(timer_params[:time_zone]).at_beginning_of_week - (cursor * 7).days
+    days = []
+
+    (0..6).each do |offset|
+      days.push(start_of_week + offset.days)
+    end
+    days
   end
 
   def has_next_page(cursor = 0)
