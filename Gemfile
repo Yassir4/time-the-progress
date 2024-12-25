@@ -36,7 +36,7 @@ gem "thruster", require: false
 gem "rack-cors"
 
 group :development, :test do
-  gem 'pry', '~> 0.15.0'
+  gem 'pry', '~> 0.15.2'
 
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
